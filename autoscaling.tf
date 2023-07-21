@@ -1,7 +1,7 @@
 resource "aws_appautoscaling_target" "table_read" {
-  count = var.create_table && var.autoscaling_enabled && length(var.autoscaling_read) > 0 ? 1 : 0
+  count = var.create_table && var.autoscaling_enabled && var.autoscaling_read_enabled  ? 1 : 0
 
-  max_capacity       = var.autoscaling_read["max_capacity"]
+  max_capacity       = var.read_max_capacity
   min_capacity       = var.read_capacity
   resource_id        = "table/${try(aws_dynamodb_table.autoscaled[0].name, aws_dynamodb_table.autoscaled_gsi_ignore[0].name)}"
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
@@ -9,9 +9,9 @@ resource "aws_appautoscaling_target" "table_read" {
 }
 
 resource "aws_appautoscaling_policy" "table_read_policy" {
-  count = var.create_table && var.autoscaling_enabled && length(var.autoscaling_read) > 0 ? 1 : 0
+  count = var.create_table && var.autoscaling_enabled && var.autoscaling_read_enabled ? 1 : 0
 
-  name               = "DynamoDBReadCapacityUtilization:${aws_appautoscaling_target.table_read[0].resource_id}"
+  name               = coalesce(var.table_read_policy_name, "DynamoDBReadCapacityUtilization:${aws_appautoscaling_target.table_read[0].resource_id}")
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.table_read[0].resource_id
   scalable_dimension = aws_appautoscaling_target.table_read[0].scalable_dimension
@@ -29,9 +29,9 @@ resource "aws_appautoscaling_policy" "table_read_policy" {
 }
 
 resource "aws_appautoscaling_target" "table_write" {
-  count = var.create_table && var.autoscaling_enabled && length(var.autoscaling_write) > 0 ? 1 : 0
+  count = var.create_table && var.autoscaling_enabled && var.autoscaling_write_enabled ? 1 : 0
 
-  max_capacity       = var.autoscaling_write["max_capacity"]
+  max_capacity       = var.write_max_capacity
   min_capacity       = var.write_capacity
   resource_id        = "table/${try(aws_dynamodb_table.autoscaled[0].name, aws_dynamodb_table.autoscaled_gsi_ignore[0].name)}"
   scalable_dimension = "dynamodb:table:WriteCapacityUnits"
@@ -39,9 +39,9 @@ resource "aws_appautoscaling_target" "table_write" {
 }
 
 resource "aws_appautoscaling_policy" "table_write_policy" {
-  count = var.create_table && var.autoscaling_enabled && length(var.autoscaling_write) > 0 ? 1 : 0
+  count = var.create_table && var.autoscaling_enabled && var.autoscaling_write_enabled ? 1 : 0
 
-  name               = "DynamoDBWriteCapacityUtilization:${aws_appautoscaling_target.table_write[0].resource_id}"
+  name               = coalesce(var.table_write_policy_name, "DynamoDBWriteCapacityUtilization:${aws_appautoscaling_target.table_write[0].resource_id}")
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.table_write[0].resource_id
   scalable_dimension = aws_appautoscaling_target.table_write[0].scalable_dimension
@@ -71,7 +71,7 @@ resource "aws_appautoscaling_target" "index_read" {
 resource "aws_appautoscaling_policy" "index_read_policy" {
   for_each = var.create_table && var.autoscaling_enabled ? var.autoscaling_indexes : {}
 
-  name               = "DynamoDBReadCapacityUtilization:${aws_appautoscaling_target.index_read[each.key].resource_id}"
+  name               = coalesce(var.index_read_policy_name, "DynamoDBReadCapacityUtilization:${aws_appautoscaling_target.index_read[each.key].resource_id}")
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.index_read[each.key].resource_id
   scalable_dimension = aws_appautoscaling_target.index_read[each.key].scalable_dimension
@@ -101,7 +101,7 @@ resource "aws_appautoscaling_target" "index_write" {
 resource "aws_appautoscaling_policy" "index_write_policy" {
   for_each = var.create_table && var.autoscaling_enabled ? var.autoscaling_indexes : {}
 
-  name               = "DynamoDBWriteCapacityUtilization:${aws_appautoscaling_target.index_write[each.key].resource_id}"
+  name               = coalesce(var.index_write_policy_name, "DynamoDBWriteCapacityUtilization:${aws_appautoscaling_target.index_write[each.key].resource_id}")
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.index_write[each.key].resource_id
   scalable_dimension = aws_appautoscaling_target.index_write[each.key].scalable_dimension

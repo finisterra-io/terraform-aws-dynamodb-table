@@ -40,8 +40,20 @@ variable "write_capacity" {
   default     = null
 }
 
+variable "write_max_capacity" {
+  description = "The max number of write units for this table. If the billing_mode is PROVISIONED, this field should be greater than 0"
+  type        = number
+  default     = null
+}
+
 variable "read_capacity" {
   description = "The number of read units for this table. If the billing_mode is PROVISIONED, this field should be greater than 0"
+  type        = number
+  default     = null
+}
+
+variable "read_max_capacity" {
+  description = "The max number of read units for this table. If the billing_mode is PROVISIONED, this field should be greater than 0"
   type        = number
   default     = null
 }
@@ -115,15 +127,23 @@ variable "tags" {
 variable "timeouts" {
   description = "Updated Terraform resource management timeouts"
   type        = map(string)
-  default = {
-    create = "10m"
-    update = "60m"
-    delete = "10m"
-  }
+  default = {}
 }
 
 variable "autoscaling_enabled" {
   description = "Whether or not to enable autoscaling. See note in README about this setting"
+  type        = bool
+  default     = false
+}
+
+variable "autoscaling_read_enabled" {
+  description = "Whether or not to enable autoscaling for table read."
+  type        = bool
+  default     = false
+}
+
+variable "autoscaling_write_enabled" {
+  description = "Whether or not to enable autoscaling for table writes."
   type        = bool
   default     = false
 }
@@ -136,6 +156,30 @@ variable "autoscaling_defaults" {
     scale_out_cooldown = 0
     target_value       = 70
   }
+}
+
+variable "table_read_policy_name" {
+  description = "Name of the read autoscaling policy"
+  type        = string
+  default     = null
+}
+
+variable "table_write_policy_name" {
+  description = "Name of the write autoscaling policy"
+  type        = string
+  default     = null
+}
+
+variable "index_read_policy_name" {
+  description = "Name of the index read autoscaling policy"
+  type        = string
+  default     = null
+}
+
+variable "index_write_policy_name" {
+  description = "Name of the index write autoscaling policy"
+  type        = string
+  default     = null
 }
 
 variable "autoscaling_read" {
