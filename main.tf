@@ -71,12 +71,7 @@ resource "aws_dynamodb_table" "this" {
     kms_key_arn = var.server_side_encryption_kms_key_arn
   }
 
-  tags = merge(
-    var.tags,
-    {
-      "Name" = format("%s", var.name)
-    },
-  )
+  tags = var.tags
 
   timeouts {
     create = lookup(var.timeouts, "create", null)
@@ -244,12 +239,7 @@ resource "aws_dynamodb_table" "autoscaled_gsi_ignore" {
     kms_key_arn = var.server_side_encryption_kms_key_arn
   }
 
-  tags = merge(
-    var.tags,
-    {
-      "Name" = format("%s", var.name)
-    },
-  )
+  tags = var.tags
 
   timeouts {
     create = lookup(var.timeouts, "create", null)
