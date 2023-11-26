@@ -127,7 +127,7 @@ variable "tags" {
 variable "timeouts" {
   description = "Updated Terraform resource management timeouts"
   type        = map(string)
-  default = {}
+  default     = {}
 }
 
 variable "autoscaling_enabled" {
@@ -216,4 +216,10 @@ variable "ignore_changes_global_secondary_index" {
   description = "Whether to ignore changes lifecycle to global secondary indices, useful for provisioned tables with scaling"
   type        = bool
   default     = false
+}
+
+variable "autoscaling" {
+  description = "A map of autoscaling settings. `max_capacity` is the only required key. See example in examples/autoscaling"
+  type        = map(string)
+  default     = {}
 }
