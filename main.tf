@@ -81,7 +81,7 @@ resource "aws_dynamodb_table" "this" {
 }
 
 resource "aws_dynamodb_table" "autoscaled" {
-  count = var.create_table && length(keys(var.autoscaling)) && !var.ignore_changes_global_secondary_index ? 1 : 0
+  count = var.create_table && length(keys(var.autoscaling)) > 0 && !var.ignore_changes_global_secondary_index ? 1 : 0
 
   name                        = var.name
   billing_mode                = var.billing_mode
