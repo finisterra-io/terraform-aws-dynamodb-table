@@ -9,7 +9,10 @@ resource "aws_appautoscaling_target" "this" {
 }
 
 resource "aws_appautoscaling_policy" "this" {
-  for_each = var.create_table ? var.autoscaling : {}
+  # Filter the var.autoscaling map to include only items with a non-empty policy_name
+  for_each = var.create_table ? {
+    for k, v in var.autoscaling : k => v if v.policy_name != null && v.policy_name != ""
+  } : {}
 
   name               = each.value.policy_name
   policy_type        = "TargetTrackingScaling"
