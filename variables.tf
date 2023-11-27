@@ -220,6 +220,6 @@ variable "ignore_changes_global_secondary_index" {
 
 variable "autoscaling" {
   description = "A map of autoscaling settings. `max_capacity` is the only required key. See example in examples/autoscaling"
-  type        = map(string)
+  type        = map(any)
   default     = {}
 }
